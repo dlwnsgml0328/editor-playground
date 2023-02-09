@@ -1,0 +1,189 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <style>
+        html { height:100%; }
+        body { 
+            margin:3px 25px 20px;
+            background:rgba(0,0,0,0); /*transparent*/
+            height:100%;
+            overflow:hidden;
+            font-family:Sans-Serif;
+            font-size:14px;
+            font-weight:300;
+            line-height:1.7; 
+        }
+        label {width:100%;padding-bottom:3px;display:block;}
+        input[type=text] {
+            font-size:14px;
+            font-weight:300;
+            letter-spacing:1px;
+            border:none;
+            padding:10px;
+            height:45px;
+            box-sizing:border-box
+        }
+        input[type=text]:focus {outline:none}
+        body {opacity:0}
+        svg {
+            overflow: hidden;
+            vertical-align: middle;
+            pointer-events: none;
+        }
+        .is-icon-flex {
+            width: 16px;
+            height: 16px;
+        }
+        button.input-select,
+        button.input-select2 {
+            flex:none;
+            width:50px;
+            height:50px;
+            background:transparent;
+            border:none;
+            cursor:pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <label id="lblMP4" for="txtMP4" style="width:100%"><span data-lang>Video URL</span>:</label>
+    <div style="display: flex;">
+        <input id="txtMP4" type="text" style="width:100%;" />
+        <button title="Select" class="input-select"><svg class="is-icon-flex"><use xlink:href="#ion-more"></use></svg></button>
+    </div>
+
+    <label id="lblPoster" for="txtPoster" style="width:100%;margin-top:12px;"><span data-lang>Video Poster</span>:</label>
+    <div style="display:flex;">
+        <input id="txtPoster" type="text" style="width:100%;" />
+        <button title="Select" class="input-select2"><svg class="is-icon-flex"><use xlink:href="#ion-more"></use></svg></button>
+    </div>
+
+    <label id="lblOverlay" for="txtOverlay" style="margin-top:12px;width:auto;display:inline-block;"><span data-lang>Overlay Opacity</span>:</label>   
+    <input id="txtOverlay" type="text" style="width:80px;" value="0.25" />
+   
+    <script>
+        var inpMP4 = document.querySelector('#txtMP4');
+        var inpPoster = document.querySelector('#txtPoster');
+        var inpOpacity = document.querySelector('#txtOverlay');
+
+        var btnSelect = document.querySelector('.input-select');
+        if (parent._cb.opts.onVideoSelectClick || parent._cb.opts.videoSelect ) {
+            var inpMP4 = document.querySelector('#txtMP4');
+            btnSelect.addEventListener('click', function(e) {
+                parent._cb.openAsset(inpMP4,'video',btnSelect);
+            });
+        } else {
+            btnSelect.style.display = 'none';
+        }
+        
+        var btnSelect2 = document.querySelector('.input-select2');
+        if (parent._cb.opts.onImageSelectClick || parent._cb.opts.imageSelect ) {
+            var inpPoster = document.querySelector('#txtPoster');
+            btnSelect2.addEventListener('click', function(e) {
+                parent._cb.openAsset(inpPoster,'image',btnSelect2);
+            });
+        } else {
+            btnSelect2.style.display = 'none';
+        }
+        
+        var settings = getSettings();
+        if (settings != 'undefined') {
+            try {
+                var json = JSON.parse(settings);
+                inpMP4.value = json[0].mp4;
+                inpPoster.value = json[0].poster;
+                inpOpacity.value = json[0].overlay;
+            } catch (e) { }
+        }
+
+        /*
+        Use construct() function to construct html & settings
+        */
+        function construct() {
+            var inpMP4 = document.querySelector('#txtMP4');
+            var inpPoster = document.querySelector('#txtPoster');
+            var inpOpacity = document.querySelector('#txtOverlay');
+
+            var html = '<video class="is-video-bg" poster="' + inpPoster.value + '" playsinline autoplay muted loop>' +
+                    '<source src="' + inpMP4.value + '" type="video/mp4">' +
+                    '</video>' +
+                    '<div class="is-overlay-video" style="opacity:' + inpOpacity.value + '"></div>';
+            setHtml(html);
+
+            var settings = '[{"mp4":"' + inpMP4.value + '","poster":"' + inpPoster.value + '","overlay":' + inpOpacity.value + '}]';
+            setSettings(settings);
+        }
+        
+        /* 
+        COMMON METHODS FOR MODULE.
+        */
+        function getHtml() {
+            var activeModule = parent.document.querySelector('[data-module-active]');
+            return decodeURIComponent(activeModule.getAttribute('data-html'));
+        }
+
+        function getSettings() {
+            var activeModule = parent.document.querySelector('[data-module-active]');
+            return decodeURIComponent(activeModule.getAttribute('data-settings'));
+        }
+
+        function setHtml(html) {
+            parent.document.querySelector('#hidModuleCode').value = html;
+        }
+
+        function setSettings(settings) {
+            parent.document.querySelector('#hidModuleSettings').value = settings;
+        }
+
+        // Style stuff
+        function applyParentStyles() {
+            var cssString = `
+                body {
+                    color: ${parent._cb.styleModalColor};
+                }
+                input[type="text"],
+                textarea {
+                    color: ${parent._cb.styleInputColor};
+                    background-color: ${parent._cb.styleInputBackground};
+                    border-bottom: ${parent._cb.styleInputBorderBottom};
+                }
+                input:focus,
+                textarea:focus {
+                    outline: none;
+                }
+                .is-icon-flex {
+                    fill: ${parent._cb.styleModalColor};
+                }
+            `;
+            var style = document.createElement('style');
+            style.type = 'text/css';
+            style.innerHTML = cssString;
+            document.getElementsByTagName('head')[0].appendChild(style);
+        }
+
+        applyParentStyles();
+
+        // Language file stuff
+        function applyLang() {
+            let elms = document.querySelectorAll('[data-lang]');
+            elms.forEach(function(elm){
+                elm.innerHTML = parent._cb.out(elm.innerHTML);
+            });
+        }
+        applyLang();
+
+        document.body.style.opacity = 1;
+    </script>
+
+    <svg width="0" height="0" style="position:absolute;display:none;">
+        <defs>
+            <symbol viewBox="0 0 512 512" id="ion-more"><path d="M113.7 304C86.2 304 64 282.6 64 256c0-26.5 22.2-48 49.7-48 27.6 0 49.8 21.5 49.8 48 0 26.6-22.2 48-49.8 48zM256 304c-27.5 0-49.8-21.4-49.8-48 0-26.5 22.3-48 49.8-48 27.5 0 49.7 21.5 49.7 48 0 26.6-22.2 48-49.7 48zM398.2 304c-27.5 0-49.8-21.4-49.8-48 0-26.5 22.2-48 49.8-48 27.5 0 49.8 21.5 49.8 48 0 26.6-22.2 48-49.8 48z"></path></symbol>
+        </defs>
+    </svg>
+</body>
+</html>
