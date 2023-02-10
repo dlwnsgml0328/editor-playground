@@ -11,6 +11,8 @@ const Edit = () => {
       <Head>
         <link rel='stylesheet' href='assets/minimalist-blocks/content.css' />
         <link rel='stylesheet' href='box/box-flex.css' />
+        <link rel='stylesheet' href='assets/scripts/glide/css/glide.core.css' type='text/css' />
+        <link rel='stylesheet' href='assets/scripts/glide/css/glide.theme.css' type='text/css' />
         <link rel='stylesheet' href='assets/scripts/navbar/navbar.css' />
       </Head>
 
